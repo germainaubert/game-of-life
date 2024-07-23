@@ -1,0 +1,6 @@
+:root {
+  --grid-background-color: #969696;
+  --grid-line-color: #969696;
+  --grid-line-shadow-color: #a7a7a7;
+  --cell-alive-color: #424242;
+}
