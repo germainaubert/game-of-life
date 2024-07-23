@@ -63,7 +63,10 @@ function randomizeGrid(): void {
   const newGeneration = JSON.parse(JSON.stringify(grid.value));
   for(let x = 0; x < grid.value.length; x++) {
     for(let y = 0; y < grid.value[x].length; y++) {
-      newGeneration[x][y] = Math.random() > 0.3 ? false : true;
+      newGeneration[x][y] = (() => {
+        if(Math.random() > 0.3) return false;
+        else return true;
+      })()
     }
   }
   grid.value = newGeneration;
