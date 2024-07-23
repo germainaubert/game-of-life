@@ -153,6 +153,4 @@ function drawLine(x: number, y: number, destX: number, destY: number) {
 <template>
   <canvas ref="canvas" class="canvas" @click="canvasClick"></canvas>
 </template>
-<style scoped>
-</style>
 

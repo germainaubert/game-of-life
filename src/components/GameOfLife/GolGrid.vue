@@ -63,7 +63,7 @@ function randomizeGrid(): void {
   const newGeneration = JSON.parse(JSON.stringify(grid.value));
   for(let x = 0; x < grid.value.length; x++) {
     for(let y = 0; y < grid.value[x].length; y++) {
-      newGeneration[x][y] = Math.random() < 0.3 ? true : false;
+      newGeneration[x][y] = Math.random() > 0.3 ? false : true;
     }
   }
   grid.value = newGeneration;
@@ -140,8 +140,5 @@ function switchCellState(cellPos: Coordinate): void {
 .grid {
   margin-top: 1%;
   text-align: center;
-}
-
-.canvas {
 }
 </style>

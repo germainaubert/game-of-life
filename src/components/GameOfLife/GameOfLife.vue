@@ -5,7 +5,7 @@ import { onErrorCaptured, ref, type Ref } from 'vue';
 import GolGrid from './GolGrid.vue';
 import GolControlPanel from './GolControlPanel.vue';
 
-const errorMsg: Ref<String | null> = ref(null);
+const errorMsg: Ref<string | null> = ref(null);
 const isPLaying: Ref<boolean> = ref(false);
 const grid: Ref<InstanceType<typeof GolGrid> | null> = ref(null);
 const gridSize: Ref<{ rows: number; columns: number }> = ref({ rows: 15, columns: 30 });
@@ -84,4 +84,8 @@ function reset() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.error {
+  display: flex;
+}
+</style>
