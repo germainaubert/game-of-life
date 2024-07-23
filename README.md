@@ -1,5 +1,7 @@
 # Portfolio
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=germainaubert_Portfolio&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=germainaubert_Portfolio)
+
 Portfolio front using Vue 3.
 
 ## Recommended IDE Setup
