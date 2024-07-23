@@ -6,10 +6,6 @@ Portfolio front using Vue 3.
 
 [VSCode](https://code.visualstudio.com/) with the following extensions: [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), and the firefox or chrome debugger extension.
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
 ## Project Setup
 
 ```sh
