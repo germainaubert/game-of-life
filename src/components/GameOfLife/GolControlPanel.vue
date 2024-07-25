@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
-  isPlaying: boolean
+  isPlaying: boolean;
+  cellLineStep: number
 }>();
 
 </script>
@@ -10,10 +11,10 @@ const props = defineProps<{
     <div class="buttons">
       <button @click="$emit('triggerPlay')">{{ props.isPlaying ? 'Pause' : 'Jouer' }}</button>
       <button @click="$emit('nextGeneration')">Suivant</button>
-      <button @click="$emit('addRow')">+ 1 ligne</button>
-      <button @click="$emit('removeRow')">- 1 ligne</button>
-      <button @click="$emit('addColumn')">+ 1 colonne</button>
-      <button @click="$emit('removeColumn')">- 1 colonne</button>
+      <button @click="$emit('addRow')">+ {{cellLineStep}} ligne</button>
+      <button @click="$emit('removeRow')">- {{cellLineStep}} ligne</button>
+      <button @click="$emit('addColumn')">+ {{cellLineStep}} colonne</button>
+      <button @click="$emit('removeColumn')">- {{cellLineStep}} colonne</button>
       <button @click="$emit('slowSim')">Slow down</button>
       <button @click="$emit('accelerateSim')">Speed up</button>
       <button @click="$emit('randomize')">Randomize</button>

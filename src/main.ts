@@ -1,9 +1,10 @@
-import './assets/main.css';
+import './styles/_main.css';
+import './styles/_constants.scss';
 
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import './assets/constants.css';
+
 
 const app = createApp(App);
 

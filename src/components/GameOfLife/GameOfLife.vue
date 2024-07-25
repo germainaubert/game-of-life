@@ -10,6 +10,7 @@ const isPLaying: Ref<boolean> = ref(false);
 const grid: Ref<InstanceType<typeof GolGrid> | null> = ref(null);
 const gridSize: Ref<{ rows: number; columns: number }> = ref({ rows: 15, columns: 30 });
 const pagePercentage: Ref<number> = ref(50);
+const cellLineStep = 10;
 const events = {
   triggerPlay: triggerPlay,
   nextGeneration: nextGeneration,
@@ -36,16 +37,16 @@ function nextGeneration() {
   if (grid.value) grid.value.nextGeneration();
 }
 function addRow() {
-  gridSize.value.rows++;
+  gridSize.value.rows += cellLineStep;
 }
 function removeRow() {
-  gridSize.value.rows--;
+  gridSize.value.rows -= cellLineStep;
 }
 function addColumn() {
-  gridSize.value.columns++;
+  gridSize.value.columns += cellLineStep;
 }
 function removeColumn() {
-  gridSize.value.columns--;
+  gridSize.value.columns -= cellLineStep;
 }
 function slowSim() {
   if (grid.value) grid.value.slowSim()
@@ -78,6 +79,7 @@ function reset() {
       ></GolGrid>
       <GolControlPanel
         :isPlaying="isPLaying"
+        :cellLineStep="cellLineStep"
         v-on="events"
       ></GolControlPanel>
     </div>

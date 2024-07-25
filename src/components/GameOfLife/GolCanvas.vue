@@ -1,102 +1,94 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue';
-import type { CellDisplayInfo, Coordinate } from './GolInterface';
+import { onMounted, ref, watch, type Ref } from 'vue';
+import type { Coordinate, DrawingCellInfo } from '../../interfaces/GolInterface';
+import { getCSSConstants } from '@/utils/cssConstants';
+import CanvasTool from '@/models/CanvasTool';
 
 const props = defineProps<{
   gridRows: number;
   gridColumns: number;
   pagePercentage: number;
-  grid: boolean[][]
+  cellsToDraw: DrawingCellInfo[];
 }>();
 
 const emit = defineEmits(['switchCellState']);
-
-const cellDisplayInfo: CellDisplayInfo = {
-  positionOffset: 40,
-  radius: 20,
-  diameter: 40,
-  padding: 5,
-  getCellCenterPosition(position: number) {
-    return this.padding * position + this.diameter * position + this.positionOffset;
-  }
-};
+let canvasTool = new CanvasTool(props.pagePercentage, props.gridColumns, props.gridRows); 
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 
-// default css values, real values are set onMounted
-let gridBackgroundColor: string = '#969696';
-let cellAliveColor: string = '#424242';
-let gridLineColor: string = '#969595';
-let gridLineShadowColor: string = '#bfbfbf';
+// css constants
+let gridBackgroundColor: string;
+let cellAliveColor: string;
+let gridLineColor: string;
+let gridLineShadowColor: string;
 
 onMounted(() => {
-  window.addEventListener('resize', resize);
-  gridBackgroundColor = getComputedStyle(document.body).getPropertyValue('--grid-background-color');
-  cellAliveColor = getComputedStyle(document.body).getPropertyValue('--cell-alive-color');
-  gridLineColor = getComputedStyle(document.body).getPropertyValue('--grid-line-color');
-  gridLineShadowColor = getComputedStyle(document.body).getPropertyValue('--grid-line-shadow-color');
+  setCSSConstants();
   resize();
 });
 
-onUnmounted(() => {
-  window.removeEventListener('resize', resize);
-});
 
 watch(() => [props.gridRows, props.gridColumns], () => {
   resize()
 })
 
-watch(() => props.grid, () => {
-  drawGrid()
+watch(() => props.cellsToDraw, () => {
+  drawCells();
 })
 
-function setCellDisplayInfo(): void {
-  cellDisplayInfo.radius = Math.ceil(((props.pagePercentage / 100) * window.innerWidth) / props.gridColumns / 2);
-  cellDisplayInfo.padding = Math.ceil((50 / 100) * cellDisplayInfo.radius);
-  cellDisplayInfo.positionOffset = cellDisplayInfo.radius + cellDisplayInfo.radius / 4;
-  cellDisplayInfo.diameter = cellDisplayInfo.radius * 2;
+function setCSSConstants(): void {
+  ({gridBackgroundColor, cellAliveColor, gridLineColor, gridLineShadowColor} = getCSSConstants());
 }
 
-// optimization needed: change from redraw every tick to -> draw only what have changed
-function drawGrid(): void {
-  const { canvasValue, ctx } = validateCanvasAndContext();
-  ctx.fillStyle = gridBackgroundColor;
-  ctx.fillRect(0, 0, canvasValue.width, canvasValue.height);
-  for (let x = 0; x < props.gridColumns; x++) {
-    drawLine(cellDisplayInfo.getCellCenterPosition(x) + cellDisplayInfo.radius + cellDisplayInfo.padding / 2, 0, cellDisplayInfo.getCellCenterPosition(x) + cellDisplayInfo.radius + cellDisplayInfo.padding / 2, canvasValue.height);
-    for (let y = 0; y < props.gridRows; y++) {
-      if(x === 0) drawLine(0, cellDisplayInfo.getCellCenterPosition(y) + cellDisplayInfo.radius + cellDisplayInfo.padding / 2, canvasValue.width, cellDisplayInfo.getCellCenterPosition(y) + cellDisplayInfo.radius + cellDisplayInfo.padding / 2);
-      const color = props.grid[x][y] ? cellAliveColor : gridBackgroundColor;
-      drawCell(color, ctx, x, y);
-    }
+function drawScene(): void {
+  drawCanvasGrid();
+  drawCells();
+}
+
+function drawCells(): void {1
+  const { ctx } = validateCanvasAndContext();
+  for(const cell of props.cellsToDraw) {
+    drawCell(cell, ctx);
   }
 }
 
 function drawCell(
-  color: string,
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
+  cell: DrawingCellInfo,
+  ctx: CanvasRenderingContext2D
 ) {
-  cellDisplayInfo.getCellCenterPosition(y)
+  console.log("jaj")
+  // clear the zone of the cell to prevent antialiazing overtaking
+  ctx.fillStyle = gridBackgroundColor;
+  ctx.fillRect(canvasTool.getClearRectAxisValue(cell.coords.x) - 1, canvasTool.getClearRectAxisValue(cell.coords.y) - 1, canvasTool.getCellDiameter() + 2, canvasTool.getCellDiameter() + 2);
+  // draw 
   ctx.beginPath();
   ctx.shadowColor = 'transparent';
   ctx.arc(
-    cellDisplayInfo.getCellCenterPosition(x),
-    cellDisplayInfo.getCellCenterPosition(y),
-    cellDisplayInfo.radius,
+    canvasTool.getCellCircleCenter(cell.coords.x),
+    canvasTool.getCellCircleCenter(cell.coords.y),
+    canvasTool.getCellRadius(),
     0,
     2 * Math.PI
   );
   ctx.lineWidth = 0;
-  ctx.fillStyle = color;
+  ctx.fillStyle = cell.status ? cellAliveColor : gridBackgroundColor;
+  console.log(cell.status ? cellAliveColor : gridBackgroundColor);
   ctx.fill();
 }
 
-function setCanvasSize(): void {
-  const canvasValue = validateCanvas();
-  canvasValue.width = cellDisplayInfo.padding * props.gridColumns + cellDisplayInfo.diameter * props.gridColumns;
-  canvasValue.height = cellDisplayInfo.padding * props.gridRows + cellDisplayInfo.diameter * props.gridRows;
+// draw or redraw the background color and lines
+function drawCanvasGrid() {
+  const { canvasValue, ctx } = validateCanvasAndContext();
+  // fill with background color
+  ctx.fillStyle = gridBackgroundColor;
+  ctx.fillRect(0, 0, canvasValue.width, canvasValue.height);
+  // loop and draw lines
+  for (let x = 0; x < props.gridColumns; x++) {
+    drawLine(canvasTool.getConstantLineAxis(x), 0, canvasTool.getConstantLineAxis(x), canvasValue.height);
+    for (let y = 0; y < props.gridRows; y++) {
+      if(x === 0) drawLine(0, canvasTool.getConstantLineAxis(y), canvasValue.width, canvasTool.getConstantLineAxis(y));
+    }
+  }
 }
 
 function validateCanvas(): HTMLCanvasElement {
@@ -133,9 +125,9 @@ function getClosestCellFromClick(clickPos: Coordinate, canvasWidth: number, canv
 }
 
 function resize(): void {
-  setCellDisplayInfo();
-  setCanvasSize();
-  drawGrid();
+  canvasTool = new CanvasTool(props.pagePercentage, props.gridColumns, props.gridRows);
+  canvasTool.setCanvasSize(validateCanvas());
+  drawScene();
 }
 
 function drawLine(x: number, y: number, destX: number, destY: number) {
@@ -151,6 +143,6 @@ function drawLine(x: number, y: number, destX: number, destY: number) {
 
 </script>
 <template>
-  <canvas ref="canvas" class="canvas" @click="canvasClick"></canvas>
+  <canvas ref="canvas" class="canvas" @mousedown="canvasClick"></canvas>
 </template>
 
