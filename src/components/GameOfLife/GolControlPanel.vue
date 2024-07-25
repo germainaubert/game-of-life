@@ -19,6 +19,7 @@ const props = defineProps<{
       <button @click="$emit('accelerateSim')">Speed up</button>
       <button @click="$emit('randomize')">Randomize</button>
       <button @click="$emit('reset')">Reset</button>
+      <button @click="$emit('clearGrid')">Clear</button>
     </div>
   </div>
 </template>

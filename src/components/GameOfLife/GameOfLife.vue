@@ -21,7 +21,8 @@ const events = {
   slowSim: slowSim,
   accelerateSim: accelerateSim,
   randomize: randomize,
-  reset: reset
+  reset: reset,
+  clearGrid: clearGrid
 }
 
 onErrorCaptured((err) => {
@@ -62,6 +63,13 @@ function reset() {
     isPLaying.value = false;
     grid.value.reset();
   }
+}
+function clearGrid() {
+  if(grid.value) {
+    isPLaying.value = false;
+    grid.value.clearGrid();
+  }
+    
 }
 
 </script>

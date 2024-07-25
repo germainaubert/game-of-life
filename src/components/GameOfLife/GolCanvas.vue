@@ -1,94 +1,49 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
-import type { Coordinate, DrawingCellInfo } from '../../interfaces/GolInterface';
-import { getCSSConstants } from '@/utils/cssConstants';
+import { gridBackgroundColor, gridLineColor, gridLineShadowColor } from '@/utils/cssConstants';
 import CanvasTool from '@/models/CanvasTool';
+import type Cell from '@/models/Cell';
+import type { Coordinate } from '@/interfaces/GolInterface';
+
+defineExpose({
+  initScene,
+});
 
 const props = defineProps<{
   gridRows: number;
   gridColumns: number;
   pagePercentage: number;
-  cellsToDraw: DrawingCellInfo[];
+  grid: Cell[][];
 }>();
 
-const emit = defineEmits(['switchCellState']);
-let canvasTool = new CanvasTool(props.pagePercentage, props.gridColumns, props.gridRows); 
+let canvasTool = new CanvasTool(props.pagePercentage, props.gridColumns, props.gridRows);
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 
-// css constants
-let gridBackgroundColor: string;
-let cellAliveColor: string;
-let gridLineColor: string;
-let gridLineShadowColor: string;
-
 onMounted(() => {
-  setCSSConstants();
-  resize();
+  initScene();
 });
 
+watch(() => props.grid, () => initScene())
 
-watch(() => [props.gridRows, props.gridColumns], () => {
-  resize()
-})
-
-watch(() => props.cellsToDraw, () => {
-  drawCells();
-})
-
-function setCSSConstants(): void {
-  ({gridBackgroundColor, cellAliveColor, gridLineColor, gridLineShadowColor} = getCSSConstants());
-}
-
-function drawScene(): void {
-  drawCanvasGrid();
-  drawCells();
-}
-
-function drawCells(): void {
-  const { ctx } = validateCanvasAndContext();
-  for(const cell of props.cellsToDraw) {
-    drawCell(cell, ctx);
-  }
-}
-
-function drawCell(
-  cell: DrawingCellInfo,
-  ctx: CanvasRenderingContext2D
-) {
-  console.log("jaj")
-  // clear the zone of the cell to prevent antialiazing overtaking
-  ctx.fillStyle = gridBackgroundColor;
-  ctx.fillRect(canvasTool.getClearRectAxisValue(cell.coords.x) - 1, canvasTool.getClearRectAxisValue(cell.coords.y) - 1, canvasTool.getCellDiameter() + 2, canvasTool.getCellDiameter() + 2);
-  // draw 
-  ctx.beginPath();
-  ctx.shadowColor = 'transparent';
-  ctx.arc(
-    canvasTool.getCellCircleCenter(cell.coords.x),
-    canvasTool.getCellCircleCenter(cell.coords.y),
-    canvasTool.getCellRadius(),
-    0,
-    2 * Math.PI
-  );
-  ctx.lineWidth = 0;
-  ctx.fillStyle = cell.status ? cellAliveColor : gridBackgroundColor;
-  console.log(cell.status ? cellAliveColor : gridBackgroundColor);
-  ctx.fill();
-}
-
-// draw or redraw the background color and lines
-function drawCanvasGrid() {
-  const { canvasValue, ctx } = validateCanvasAndContext();
+// fill the canvas with the background color and display lines
+function drawCanvasBackground(canvasValue: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  console.log("background");
   // fill with background color
   ctx.fillStyle = gridBackgroundColor;
   ctx.fillRect(0, 0, canvasValue.width, canvasValue.height);
+
   // loop and draw lines
   for (let x = 0; x < props.gridColumns; x++) {
-    drawLine(canvasTool.getConstantLineAxis(x), 0, canvasTool.getConstantLineAxis(x), canvasValue.height);
+    drawLine(canvasTool.getConstantLineAxis(x), 0, canvasTool.getConstantLineAxis(x), canvasValue.height, ctx);
     for (let y = 0; y < props.gridRows; y++) {
-      if(x === 0) drawLine(0, canvasTool.getConstantLineAxis(y), canvasValue.width, canvasTool.getConstantLineAxis(y));
+      if(x === 0) drawLine(0, canvasTool.getConstantLineAxis(y), canvasValue.width, canvasTool.getConstantLineAxis(y), ctx);
     }
   }
+}
+
+function drawCells() {
+  props.grid.forEach((cellArray: Cell[]) => cellArray.forEach((cell: Cell) => cell.drawCell()))
 }
 
 function validateCanvas(): HTMLCanvasElement {
@@ -113,29 +68,34 @@ function validateCanvasAndContext(): {
 function canvasClick(event: MouseEvent) {
   const { canvasValue } = validateCanvasAndContext();
   const rect = canvasValue.getBoundingClientRect();
-  const clickPos: Coordinate = { x: event.clientX - rect.left, y: event.clientY - rect.top }
-  const closestCell = getClosestCellFromClick(clickPos, rect.width, rect.height);
-  emit('switchCellState', closestCell);
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top
+  const coords = getClosestCellFromClick(x, y, rect.width, rect.height);
+  props.grid[coords.x][coords.y].inverseStatus();
 }
 
-function getClosestCellFromClick(clickPos: Coordinate, canvasWidth: number, canvasHeight: number): Coordinate {
-  const approximationCellSize = { height: canvasHeight / props.gridRows, width: canvasWidth / props.gridColumns};
-  const cellPos = { x: Math.floor(clickPos.x / approximationCellSize.width), y: Math.floor(clickPos.y / approximationCellSize.height) };
+function getClosestCellFromClick(x: number, y: number, canvasWidth: number, canvasHeight: number): Coordinate {
+  const approximationCellSize = { height: canvasHeight / props.gridRows, width: canvasWidth / props.gridColumns };
+  const cellPos = { x: Math.floor(x / approximationCellSize.width), y: Math.floor(y / approximationCellSize.height) };
   return cellPos;
 }
 
-function resize(): void {
+function initScene(): void {
   canvasTool = new CanvasTool(props.pagePercentage, props.gridColumns, props.gridRows);
-  canvasTool.setCanvasSize(validateCanvas());
-  drawScene();
+  const { canvasValue, ctx } = validateCanvasAndContext();
+  canvasTool.setCanvasSize(canvasValue);
+  drawCanvasBackground(canvasValue, ctx);
+  setCellDrawingTools(ctx, canvasTool);
+  drawCells();
 }
 
-function drawLine(x: number, y: number, destX: number, destY: number) {
-  const { ctx } = validateCanvasAndContext();
+function setCellDrawingTools(ctx: CanvasRenderingContext2D, canvasTool: CanvasTool) {
+  props.grid.forEach((cellArray: Cell[]) => cellArray.forEach((cell: Cell) => cell.setDrawingTools(ctx, canvasTool)));
+}
+
+function drawLine(x: number, y: number, destX: number, destY: number, ctx: CanvasRenderingContext2D) {
   ctx.beginPath();
-  ctx.shadowColor = gridLineShadowColor;
   ctx.strokeStyle = gridLineColor;
-  ctx.shadowBlur = 4;
   ctx.moveTo(x, y);
   ctx.lineTo(destX, destY);
   ctx.stroke();
@@ -143,6 +103,6 @@ function drawLine(x: number, y: number, destX: number, destY: number) {
 
 </script>
 <template>
-  <canvas ref="canvas" class="canvas" @mousedown="canvasClick"></canvas>
+  <canvas ref="canvas" class="canvas" :canvasTool="canvasTool" @mousedown="canvasClick"></canvas>
 </template>
 

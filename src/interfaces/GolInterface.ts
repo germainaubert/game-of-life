@@ -5,12 +5,7 @@ export interface CanvasToolInterface {
   getAbsolutePosition(position: number): number;
 }
 
-export interface DrawingCellInfo {
-  coords: Coordinate;
-  status: boolean;
-}
-
 export interface Coordinate {
-  x: number,
-  y: number
+  x: number;
+  y: number;
 }
