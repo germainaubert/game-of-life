@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, watch, ref, type Ref, toRaw } from 'vue';
+import { onBeforeMount, watch, ref, type Ref } from 'vue';
 import GolCanvas from './GolCanvas.vue';
 import Cell from '@/models/Cell';
 
