@@ -45,7 +45,7 @@ function drawScene(): void {
   drawCells();
 }
 
-function drawCells(): void {1
+function drawCells(): void {
   const { ctx } = validateCanvasAndContext();
   for(const cell of props.cellsToDraw) {
     drawCell(cell, ctx);
