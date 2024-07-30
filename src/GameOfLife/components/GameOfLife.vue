@@ -8,7 +8,7 @@ import GolControlPanel from './ControlPanel.vue';
 const errorMsg: Ref<string | null> = ref(null);
 const isPLaying: Ref<boolean> = ref(false);
 const grid: Ref<InstanceType<typeof GolGrid> | null> = ref(null);
-const gridSize: Ref<{ rows: number; columns: number }> = ref({ rows: 5, columns: 10 });
+const gridSize: Ref<{ rows: number; columns: number }> = ref({ rows: 15, columns: 40 });
 const pagePercentage: Ref<number> = ref(70);
 const cellLineStep = 10;
 const events = {
@@ -21,7 +21,6 @@ const events = {
   slowSim: slowSim,
   accelerateSim: accelerateSim,
   randomize: randomize,
-  reset: reset,
   clearGrid: clearGrid
 }
 
@@ -56,9 +55,6 @@ function accelerateSim() {
   if (grid.value) grid.value.accelerateSim()
 }
 function randomize() {
-  if (grid.value) grid.value.randomizeGrid();
-}
-function reset() {
   if (grid.value) {
     isPLaying.value = false;
     grid.value.reset();
@@ -68,8 +64,7 @@ function clearGrid() {
   if(grid.value) {
     isPLaying.value = false;
     grid.value.clearGrid();
-  }
-    
+  }   
 }
 </script>
 

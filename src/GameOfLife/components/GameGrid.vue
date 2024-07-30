@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch, ref, type Ref } from 'vue';
 import CanvasComponent from './CanvasComponent.vue';
-import GridCell from '@/models/GridCell';
+import GridCell from '@/GameOfLife/classes/GridCell';
 
 const props = defineProps<{
   gridRows: number;
@@ -12,7 +12,6 @@ const props = defineProps<{
 
 defineExpose({
   nextGeneration,
-  randomizeGrid,
   reset,
   slowSim,
   accelerateSim,
@@ -21,7 +20,7 @@ defineExpose({
 
 // grid is the source of truth of the cells state
 // it is mainly used to calculate the next generation
-const grid: Ref<GridCell[][]> = ref(initGrid());
+let grid: GridCell[][] = initGrid();
 // canvasComponent to draw background on grid clear
 const canvasComponent: Ref<InstanceType<typeof CanvasComponent> | null> = ref(null);
 
@@ -45,30 +44,38 @@ function handleInterval(isPlaying: boolean) {
   }
 }
 
-function reset() {
-  intervalDuration.value = defaultIntervalDuration;
-  resetGrid();
-}
-
 function initGrid(): GridCell[][] {
   return Array.from({ length: props.gridColumns }, (_, x) =>
     Array.from({ length: props.gridRows }, (_, y) => new GridCell(x, y))
   );
 }
 
-function resetGrid() {
-  const newGrid = initGrid();
-  grid.value.length = 0;
-  newGrid.forEach(cellArray => grid.value.push(cellArray));
-}
-
-function randomizeGrid(): void {
-  grid.value.forEach(cellArray => cellArray.forEach(cell => cell.setRandomizedStatus()));
+function reset() {
+  intervalDuration.value = defaultIntervalDuration;
+  grid = initGrid();
+  updateCanvasOldGrid();
+  drawGrid(true);
 }
 
 function clearGrid(): void {
-  grid.value.forEach(cellArray => cellArray.forEach(cell => cell.alive = false));
-  if(canvasComponent.value) canvasComponent.value.drawCanvasBackground();
+  grid.forEach(cellArray => cellArray.forEach(cell => cell.alive = false));
+  updateCanvasOldGrid();
+}
+
+function drawGrid(initialDraw: boolean) {
+  const canvasComp = validateCanvasComponent();
+  if(initialDraw) canvasComp.drawInitialGrid(grid);
+  else canvasComp.drawGrid(grid);
+}
+
+function updateCanvasOldGrid() {
+  const canvasComp = validateCanvasComponent(); 
+  canvasComp.updateOldGrid(grid);
+}
+
+function validateCanvasComponent() {
+  if(!canvasComponent.value) throw new ReferenceError('canvasComponent.value is null');
+  return canvasComponent.value;
 }
 
 function slowSim() {
@@ -88,22 +95,23 @@ function simGenerationIntervalUpdated() {
 
 // fix updateStatus 
 function nextGeneration() {
-  const gridFreezedState = grid.value.map(cellArray => cellArray.map(cell => cell.alive));
-  for (let x = 0; x < grid.value.length; x++) {
-    for (let y = 0; y < grid.value[x].length; y++) {
-      grid.value[x][y].alive = processCellStatus(x, y, gridFreezedState);
+  const gridFreezedState: GridCell[][] = JSON.parse(JSON.stringify(grid));
+  for (let x = 0; x < grid.length; x++) {
+    for (let y = 0; y < grid[x].length; y++) {
+      grid[x][y].alive = processCellStatus(x, y, gridFreezedState);
     }
   }
+  drawGrid(false);
 }
 
-function processCellStatus(x: number, y: number, gridFreezedState: boolean[][]): boolean {
+function processCellStatus(x: number, y: number, gridFreezedState: GridCell[][]): boolean {
   const neighbors = checkCellNeighbors(x, y, gridFreezedState);
   if (neighbors === 3) return true;
-  else if (neighbors == 2 && grid.value[x][y].alive) return true;
+  else if (neighbors == 2 && grid[x][y].alive) return true;
   else return false;
 }
 
-function checkCellNeighbors(x: number, y: number, gridFreezedState: boolean[][]): number {
+function checkCellNeighbors(x: number, y: number, gridFreezedState: GridCell[][]): number {
   const directions = [
     [-1, -1],
     [-1, 0],
@@ -120,14 +128,15 @@ function checkCellNeighbors(x: number, y: number, gridFreezedState: boolean[][])
     const nx = x + dx;
     const ny = y + dy;
     if (nx >= 0 && nx < props.gridColumns && ny >= 0 && ny < props.gridRows) {
-      if (gridFreezedState[nx][ny]) neighbors++;
+      if (gridFreezedState[nx][ny].alive) neighbors++;
     }
   }
   return neighbors;
 }
 
 function inverseCellStatus(x: number, y: number) {
-  grid.value[x][y].alive = !grid.value[x][y].alive; 
+  grid[x][y].alive = !grid[x][y].alive; 
+  drawGrid(false);
 }
 </script>
 

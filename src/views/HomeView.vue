@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GameOfLife from '../components/GameOfLife/GameOfLife.vue'
+import GameOfLife from '@/GameOfLife/components/GameOfLife.vue';
 
 </script>
 

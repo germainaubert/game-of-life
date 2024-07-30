@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, type Reactive, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref } from 'vue';
 import { gridBackgroundColor } from '@/utils/cssConstants';
 import type { Coordinate } from '@/interfaces/GolInterface';
-import type GridCell from '@/models/GridCell';
-import CanvasCell from '@/components/GameOfLife/CanvasCell.vue'
+import type GridCell from '../classes/GridCell';
+import { DrawingTool } from '../classes/DrawingTool';
 
 const emit = defineEmits<{
   inverseGridCellStatus: [x: number, y: number]
@@ -15,40 +15,80 @@ const props = defineProps<{
   pagePercentage: number;
   isPlaying: boolean;
   intervalDuration: number;
-  grid: Reactive<GridCell[][]>;
+  grid: GridCell[][];
 }>();
 
 defineExpose({
-  drawCanvasBackground
+  drawGrid,
+  drawInitialGrid,
+  updateOldGrid
 });
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 const canvasContext: Ref<CanvasRenderingContext2D | null> = ref(null);
-const radius: Ref<number> = ref(getRadius());
-const cancelAnimation: Ref<boolean> = ref(false);
 
-const padding = computed<number>(() => Math.ceil(0.5 * radius.value));
-const diameter = computed<number>(() => radius.value * 2);
+let drawingTool: DrawingTool | null = null
+let oldGrid: GridCell[][] = [];
 
 onMounted(() => {
   if(!canvas.value) throw new ReferenceError('Error mounting CanvasComponent, canvas.value is null');
   canvasContext.value = canvas.value.getContext('2d');
   if(!canvasContext.value) throw new ReferenceError('Error mounting CanvasComponent, canvasContext is null');
+  oldGrid = JSON.parse(JSON.stringify(props.grid));
   initScene();
+  drawInitialGrid(props.grid);
 })
 
-watch(() => [props.gridRows, props.gridColumns, props.pagePercentage], () => initScene());
+watch(() => [props.gridRows, props.gridColumns, props.pagePercentage], () => resetScene());
+
+watch(() => props.intervalDuration, () => drawingTool?.updateAnimationDuration(props.intervalDuration));
 
 function initScene() {
-  const { canvasValue } = validateCanvasAndContext();
-  radius.value = getRadius()
-  setCanvasSize(canvasValue);
+  if(drawingTool) drawingTool.cancelAnimations();
+  const { canvasValue, ctx } = validateCanvasAndContext();
+  drawingTool = new DrawingTool(props.intervalDuration, ctx, calculateRadius());
+  setCanvasSize(canvasValue, drawingTool);
   drawCanvasBackground();
 }
 
-function setCanvasSize(canvas: HTMLCanvasElement): void {
-  canvas.width = getAbsolutePosition(props.gridColumns);
-  canvas.height = getAbsolutePosition(props.gridRows);
+function resetScene() {
+  initScene();
+  drawInitialGrid(props.grid);
+}
+
+function drawGrid(grid: GridCell[][]) {
+  drawingTool?.requestDraw(getGridDiff(grid));
+}
+
+function drawInitialGrid(grid: GridCell[][]) {
+  drawingTool?.requestDraw(getGridAlive(grid));
+}
+
+function getGridDiff(newGrid: GridCell[][]): GridCell[] {
+  const diffGrid: GridCell[] = [];
+  newGrid.forEach((cellArray, x) => cellArray.forEach((cell, y) => {
+    if(cell.alive !== oldGrid[x][y].alive) diffGrid.push(cell);
+  }))
+  oldGrid = JSON.parse(JSON.stringify(newGrid));
+  return diffGrid;
+}
+
+function getGridAlive(grid: GridCell[][]): GridCell[] {
+  const gridAlive: GridCell[] = [];
+  grid.forEach(cellArray => cellArray.forEach(cell => {
+    if(cell.alive) gridAlive.push(cell);
+  }));
+  return gridAlive;
+}
+
+function updateOldGrid(grid: GridCell[][]) {
+  drawCanvasBackground();
+  oldGrid = JSON.parse(JSON.stringify(grid));
+}
+
+function setCanvasSize(canvas: HTMLCanvasElement, drawingTool: DrawingTool): void {
+  canvas.width = drawingTool.getAbsolutePosition(props.gridColumns);
+  canvas.height = drawingTool.getAbsolutePosition(props.gridRows);
 }
 
 function validateCanvas(): HTMLCanvasElement {
@@ -70,21 +110,17 @@ function validateCanvasAndContext(): {
   return { canvasValue, ctx };
 }
 
-function getAbsolutePosition(position: number): number {
-  return (padding.value + diameter.value) * position;
-}
-
-function getRadius(): number {
+function calculateRadius(): number {
   return Math.ceil(((props.pagePercentage / 100) * window.innerWidth) / props.gridColumns / 2);
 }
 
 // fill the canvas with the background color
 function drawCanvasBackground() {
+  if(drawingTool) drawingTool.cancelAnimations();
   const { canvasValue, ctx } = validateCanvasAndContext();
   ctx.fillStyle = gridBackgroundColor;
   ctx.fillRect(0, 0, canvasValue.width, canvasValue.height);
   ctx.fill();
-  console.log("draw background");
 }
 
 function canvasClick(event: MouseEvent) {
@@ -102,23 +138,9 @@ function getClosestCellFromClick(x: number, y: number, canvasWidth: number, canv
   const cellPos = { x: Math.floor(x / approximationCellSize.width), y: Math.floor(y / approximationCellSize.height) };
   return cellPos;
 }
-
-// function drawLine(x: number, y: number, destX: number, destY: number, ctx: CanvasRenderingContext2D) {
-//   ctx.beginPath();
-//   ctx.strokeStyle = gridLineColor;
-//   ctx.moveTo(x, y);
-//   ctx.lineTo(destX, destY);
-//   ctx.stroke();
-// }
 </script>
 
 <template>
   <canvas ref="canvas" @mousedown="canvasClick"></canvas>
-  <div v-if="canvasContext">
-    <div  v-for="cellArray, index in grid" :key="index">
-      <CanvasCell v-for="cell, index in cellArray" :key="index" :x="cell.x" :y="cell.y" :alive="cell.alive" :radius="radius" :diameter="diameter" :intervalDuration="intervalDuration"  :ctx="canvasContext" :cancelAnimation="cancelAnimation"></CanvasCell>
-    </div>
-  </div>
-  
 </template>
 
