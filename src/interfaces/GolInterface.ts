@@ -1,8 +1,6 @@
-export interface CanvasToolInterface {
-  getCellRadius(): number;
-  getCellCircleCenter(position: number): number;
-  getConstantLineAxis(position: number): number;
-  getAbsolutePosition(position: number): number;
+export interface Cell {
+  x: number;
+  y: number;
 }
 
 export interface Coordinate {

@@ -2,14 +2,14 @@
 // Game of life (GOF) component
 
 import { onErrorCaptured, ref, type Ref } from 'vue';
-import GolGrid from './GolGrid.vue';
-import GolControlPanel from './GolControlPanel.vue';
+import GolGrid from './GameGrid.vue';
+import GolControlPanel from './ControlPanel.vue';
 
 const errorMsg: Ref<string | null> = ref(null);
 const isPLaying: Ref<boolean> = ref(false);
 const grid: Ref<InstanceType<typeof GolGrid> | null> = ref(null);
-const gridSize: Ref<{ rows: number; columns: number }> = ref({ rows: 15, columns: 30 });
-const pagePercentage: Ref<number> = ref(50);
+const gridSize: Ref<{ rows: number; columns: number }> = ref({ rows: 5, columns: 10 });
+const pagePercentage: Ref<number> = ref(70);
 const cellLineStep = 10;
 const events = {
   triggerPlay: triggerPlay,
@@ -71,7 +71,6 @@ function clearGrid() {
   }
     
 }
-
 </script>
 
 <template>
