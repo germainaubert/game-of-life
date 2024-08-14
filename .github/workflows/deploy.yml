@@ -17,10 +17,12 @@ jobs:
       with:
         version: 8
     
-    - name: Build
+    - name: Install dependencies
+      run: pnpm install
+    - name: Increment Version
+      run : pnpm version patch
+    - name: Build and Publish
       run: |
-        pnpm install
-        pnpm version patch
         pnpm run build
         pnpm publish
       env:
