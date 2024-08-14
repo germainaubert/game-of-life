@@ -23,7 +23,7 @@ jobs:
     - name: Build and Publish
       run: |
         pnpm run build
-        pnpm publish
+        pnpm publish --no-git-checks
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
