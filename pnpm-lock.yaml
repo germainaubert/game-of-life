@@ -25,11 +25,11 @@ importers:
         specifier: ^21.1.6
         version: 21.1.7
       '@types/node':
-        specifier: ^20.12.5
-        version: 20.14.12
+        specifier: ^22.3.0
+        version: 22.3.0
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
-        version: 5.1.0(vite@5.3.4(@types/node@20.14.12)(sass@1.77.8))(vue@3.4.33(typescript@5.4.5))
+        version: 5.1.0(vite@5.3.4(@types/node@22.3.0)(sass@1.77.8))(vue@3.4.33(typescript@5.4.5))
       '@vue/eslint-config-prettier':
         specifier: ^9.0.0
         version: 9.0.0(eslint@8.57.0)(prettier@3.3.3)
@@ -65,10 +65,10 @@ importers:
         version: 5.4.5
       vite:
         specifier: ^5.2.8
-        version: 5.3.4(@types/node@20.14.12)(sass@1.77.8)
+        version: 5.3.4(@types/node@22.3.0)(sass@1.77.8)
       vitest:
         specifier: ^1.6.0
-        version: 1.6.0(@types/node@20.14.12)(jsdom@24.1.1)(sass@1.77.8)
+        version: 1.6.0(@types/node@22.3.0)(jsdom@24.1.1)(sass@1.77.8)
       vue-tsc:
         specifier: ^2.0.11
         version: 2.0.28(typescript@5.4.5)
@@ -390,8 +390,8 @@ packages:
   '@types/jsdom@21.1.7':
     resolution: {integrity: sha512-yOriVnggzrnQ3a9OKOCxaVuSug3w3/SbOj5i7VwXWZEyUNl3bLF9V3MfxGbZKuwqJOQyRfqXyROBB1CoZLFWzA==}
 
-  '@types/node@20.14.12':
-    resolution: {integrity: sha512-r7wNXakLeSsGT0H1AU863vS2wa5wBOK4bWMjZz2wj+8nBx+m5PeIn0k8AloSLpRuiwdRQZwarZqHE4FNArPuJQ==}
+  '@types/node@22.3.0':
+    resolution: {integrity: sha512-nrWpWVaDZuaVc5X84xJ0vNrLvomM205oQyLsRt7OHNZbSHslcWsvgFR7O7hire2ZonjLrWBbedmotmIlJDVd6g==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -1501,8 +1501,8 @@ packages:
   ufo@1.5.4:
     resolution: {integrity: sha512-UsUk3byDzKd04EyoZ7U4DOlxQaD14JUKQl6/P7wiX4FNvUfm3XL246n9W5AmqwW5RSFJ27NAuM0iLscAOYUiGQ==}
 
-  undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+  undici-types@6.18.2:
+    resolution: {integrity: sha512-5ruQbENj95yDYJNS3TvcaxPMshV7aizdv/hWYjGIKoANWKjhWNBsr2YEuYZKodQulB1b8l7ILOuDQep3afowQQ==}
 
   universalify@0.2.0:
     resolution: {integrity: sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==}
@@ -1897,13 +1897,13 @@ snapshots:
 
   '@types/jsdom@21.1.7':
     dependencies:
-      '@types/node': 20.14.12
+      '@types/node': 22.3.0
       '@types/tough-cookie': 4.0.5
       parse5: 7.1.2
 
-  '@types/node@20.14.12':
+  '@types/node@22.3.0':
     dependencies:
-      undici-types: 5.26.5
+      undici-types: 6.18.2
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -1990,9 +1990,9 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-vue@5.1.0(vite@5.3.4(@types/node@20.14.12)(sass@1.77.8))(vue@3.4.33(typescript@5.4.5))':
+  '@vitejs/plugin-vue@5.1.0(vite@5.3.4(@types/node@22.3.0)(sass@1.77.8))(vue@3.4.33(typescript@5.4.5))':
     dependencies:
-      vite: 5.3.4(@types/node@20.14.12)(sass@1.77.8)
+      vite: 5.3.4(@types/node@22.3.0)(sass@1.77.8)
       vue: 3.4.33(typescript@5.4.5)
 
   '@vitest/expect@1.6.0':
@@ -3102,7 +3102,7 @@ snapshots:
 
   ufo@1.5.4: {}
 
-  undici-types@5.26.5: {}
+  undici-types@6.18.2: {}
 
   universalify@0.2.0: {}
 
@@ -3117,13 +3117,13 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite-node@1.6.0(@types/node@20.14.12)(sass@1.77.8):
+  vite-node@1.6.0(@types/node@22.3.0)(sass@1.77.8):
     dependencies:
       cac: 6.7.14
       debug: 4.3.5
       pathe: 1.1.2
       picocolors: 1.0.1
-      vite: 5.3.4(@types/node@20.14.12)(sass@1.77.8)
+      vite: 5.3.4(@types/node@22.3.0)(sass@1.77.8)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -3134,17 +3134,17 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.3.4(@types/node@20.14.12)(sass@1.77.8):
+  vite@5.3.4(@types/node@22.3.0)(sass@1.77.8):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.39
       rollup: 4.19.0
     optionalDependencies:
-      '@types/node': 20.14.12
+      '@types/node': 22.3.0
       fsevents: 2.3.3
       sass: 1.77.8
 
-  vitest@1.6.0(@types/node@20.14.12)(jsdom@24.1.1)(sass@1.77.8):
+  vitest@1.6.0(@types/node@22.3.0)(jsdom@24.1.1)(sass@1.77.8):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -3163,11 +3163,11 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.3.4(@types/node@20.14.12)(sass@1.77.8)
-      vite-node: 1.6.0(@types/node@20.14.12)(sass@1.77.8)
+      vite: 5.3.4(@types/node@22.3.0)(sass@1.77.8)
+      vite-node: 1.6.0(@types/node@22.3.0)(sass@1.77.8)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 20.14.12
+      '@types/node': 22.3.0
       jsdom: 24.1.1
     transitivePeerDependencies:
       - less
