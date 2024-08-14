@@ -19,8 +19,6 @@ jobs:
     
     - name: Install dependencies
       run: pnpm install
-    - name: Increment Version
-      run : pnpm version patch
     - name: Build and Publish
       run: |
         pnpm run build
