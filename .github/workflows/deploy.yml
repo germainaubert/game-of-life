@@ -20,8 +20,8 @@ jobs:
     - name: Build
       run: |
         pnpm install
-        pnpm run build
         pnpm version patch
+        pnpm run build
         pnpm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
