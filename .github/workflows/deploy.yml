@@ -13,10 +13,13 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: '>=20.6.0'
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 8
     
     - name: Build
       run: |
-        npm ci
+        pnpm install
         npm run build
         npm version patch
         npm publish
