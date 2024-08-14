@@ -35,7 +35,7 @@ watch(() => props.isPlaying, (isPlaying: boolean) => handleInterval(isPlaying));
 
 function handleInterval(isPlaying: boolean) {
   if (isPlaying) {
-    intervalId = setInterval(() => {
+    intervalId = window.setInterval(() => {
       nextGeneration();
     }, intervalDuration.value);
   } else if (intervalId) {

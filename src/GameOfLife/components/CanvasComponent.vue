@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
-import { gridBackgroundColor } from '@/utils/cssConstants';
+import { gridBackgroundColor } from '@/styles/_constants';
 import type { Coordinate } from '@/interfaces/GolInterface';
 import type GridCell from '../classes/GridCell';
 import { DrawingTool } from '../classes/DrawingTool';

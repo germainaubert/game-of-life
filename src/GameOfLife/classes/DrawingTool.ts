@@ -1,5 +1,6 @@
 import type GridCell from "@/GameOfLife/classes/GridCell";
-import { cellAliveColor, gridBackgroundColor } from "@/utils/cssConstants";
+import { cellAliveColor, gridBackgroundColor } from "@/styles/_constants";
+
 
 export class DrawingTool {
   private animationDuration: number;

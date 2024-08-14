@@ -1,5 +1,4 @@
 import './styles/_main.css';
-import './styles/_constants.scss';
 
 import { createApp } from 'vue';
 import App from './App.vue';
