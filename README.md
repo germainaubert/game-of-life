@@ -1,8 +1,8 @@
-# Portfolio
+# Game of life
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=germainaubert_Portfolio&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=germainaubert_Portfolio)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=germainaubert_game-of-life&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=germainaubert_game-of-life)
 
-Portfolio front using Vue 3.
+Game of life using Vue 3.
 
 ## Recommended IDE Setup
 
