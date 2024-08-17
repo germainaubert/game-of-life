@@ -29,7 +29,7 @@ jobs:
     - name: Build project
       run: | 
         pnpm run build
-        cd ./dist/ && zip game-of-life.zip ./*
+        cd ./dist/ && zip -r game-of-life.zip ./*
         cd ..
 
     - name: Get project version from package.json
