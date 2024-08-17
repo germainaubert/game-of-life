@@ -27,15 +27,17 @@ jobs:
       run: pnpm install
 
     - name: Build project
-      run: pnpm run build
+      run: | 
+        pnpm run build
+        zip game-of-life.zip ./dist/*
 
     - name: Get project version from package.json
       run: echo "project_version=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
 
     - name: Create release
-      run: gh release create $project_version -F CHANGELOG.md
+      run: gh release create $project_version ./dist/*.zip -F CHANGELOG.md
 
-    - name: Upload build to release
-      run: gh release upload $project_version ./dist/
+    # - name: Upload build to release
+    #   run: gh release upload $project_version ./dist/
       
   
