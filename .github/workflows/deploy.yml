@@ -9,22 +9,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
       with:
         version: 8
-    - uses: actions/setup-node@v4
+    - name: Setup node
+      uses: actions/setup-node@v4
       with:
         node-version: '>=20.6.0'
         cache: 'pnpm'
-        registry-url: 'https://npm.pkg.github.com'
     
     - name: Install dependencies
       run: pnpm install
-    - name: Build and Publish
-      run: |
-        pnpm run build
-        pnpm publish --no-git-checks
+
+    - name: Build project
+      run: pnpm run build
+
+    - name: Create release
+      id: release-step
+      uses: actions/create-release@v1
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-of-life
+        path: ./dist/
   
