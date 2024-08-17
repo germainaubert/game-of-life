@@ -25,5 +25,5 @@ jobs:
         pnpm run build
         pnpm publish --no-git-checks
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
