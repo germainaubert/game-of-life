@@ -17,6 +17,7 @@ jobs:
       with:
         node-version: '>=20.6.0'
         cache: 'pnpm'
+        registry-url: 'https://npm.pkg.github.com'
     
     - name: Install dependencies
       run: pnpm install
@@ -25,5 +26,5 @@ jobs:
         pnpm run build
         pnpm publish --no-git-checks
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
