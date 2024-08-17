@@ -7,6 +7,8 @@ on:
 jobs:
   publish-package:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - name: Checkout repo
@@ -27,20 +29,13 @@ jobs:
     - name: Build project
       run: pnpm run build
 
-    - name: Create release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ github.ref_name }}
-      run: |
-        gh release create "$tag" \
-          --repo="$GITHUB_REPOSITORY" \
-          --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
-          -F CHANGELOG.md
-        
+    - name: Get project version from package.json
+      run: echo "project_version=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
 
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: game-of-life
-        path: ./dist/
+    - name: Create release
+      run: gh release create $project_version -F CHANGELOG.md
+
+    - name: Upload build to release
+      run: gh release upload $project_version ./dist/
+      
   
